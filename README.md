@@ -1,8 +1,12 @@
 # Hệ thống Giám sát người lái (DMS) trên ROS2 với cảnh báo qua CAN bus
 
-Đồ án môn học (làm theo nhóm 3 sinh viên) – Ngành Kỹ sư Ô tô số, Đại học Bách khoa Hà Nội (HUST), 2026.
+Đồ án môn học – Ngành Kỹ sư Ô tô số, Đại học Bách khoa Hà Nội (HUST), 2026.
 
 Phần mềm giám sát người lái dùng camera trong cabin để phát hiện **buồn ngủ** (nhắm mắt kéo dài) và **mất tập trung** (quay đầu đi chỗ khác, rời khỏi khung hình). Hệ thống được tổ chức thành các node ROS2 độc lập; khi phát hiện nguy cơ, trạng thái cảnh báo được gửi ra **CAN bus qua SocketCAN** tới một vi điều khiển (Arduino) để kích hoạt cảnh báo phần cứng, đồng thời hiển thị trên giao diện web.
+
+## Video demo
+
+[![Video demo DMS](https://img.youtube.com/vi/4RZDJwtkaXk/hqdefault.jpg)](https://www.youtube.com/watch?v=4RZDJwtkaXk)
 
 ## Tính năng
 
