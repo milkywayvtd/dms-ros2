@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Driver Monitor · Raspberry Pi</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header>
+    <div><span class="eyebrow">RASPBERRY PI · ROS 2</span><h1>Driver Monitor</h1></div>
+    <div id="connection" class="pill muted">Đang kết nối…</div>
+  </header>
+
+  <main>
+    <section class="hero-grid">
+      <article id="warning-card" class="warning-card fault">
+        <span class="eyebrow">CẢNH BÁO REALTIME</span>
+        <h2 id="warning-label">SYSTEM FAULT</h2>
+        <div class="duration-grid">
+          <div><span>Mắt nhắm</span><strong id="eyes-duration">0.0 s</strong></div>
+          <div><span>Nhìn lệch</span><strong id="away-duration">0.0 s</strong></div>
+          <div><span>Rời khung</span><strong id="out-duration">0.0 s</strong></div>
+        </div>
+        <div class="flags">
+          <span id="flag-face">Không thấy mặt</span>
+          <span id="flag-eyes">Mắt mở</span>
+          <span id="flag-away">Nhìn thẳng</span>
+        </div>
+      </article>
+
+      <article class="video-card">
+        <img id="mjpeg-source" src="/stream.mjpg" alt="Video xử lý từ Raspberry Pi">
+        <canvas id="video-canvas" class="capture-canvas" width="640" height="480"></canvas>
+        <div class="video-actions">
+          <button id="snapshot" class="secondary">Lưu ảnh PNG</button>
+          <button id="record">Bắt đầu ghi</button>
+          <span id="record-status" class="muted">Chưa ghi</span>
+        </div>
+      </article>
+    </section>
+
+    <section class="metrics-grid">
+      <article><span>EAR</span><strong id="metric-ear">—</strong></article>
+      <article><span>Yaw / Pitch</span><strong id="metric-pose">—</strong></article>
+      <article><span>Confidence</span><strong id="metric-confidence">—</strong></article>
+      <article><span>AI FPS</span><strong id="metric-fps">—</strong></article>
+      <article><span>Camera</span><strong id="health-camera">—</strong></article>
+      <article><span>CAN</span><strong id="health-can">—</strong></article>
+      <article><span>Arduino</span><strong id="health-arduino">—</strong></article>
+    </section>
+
+    <section class="config-shell video-config-shell">
+      <div class="section-heading">
+        <div><span class="eyebrow">ÁP DỤNG TỰ ĐỘNG</span><h2>Cấu hình video</h2><p class="hint">Mỗi thay đổi được gửi ngay đến Raspberry Pi và tự động lưu.</p></div>
+        <span id="video-apply-status" class="pill muted">Sẵn sàng</span>
+      </div>
+      <div id="message" class="message" hidden></div>
+
+      <div class="config-grid">
+        <fieldset>
+          <legend>Camera & màu sắc</legend>
+          <label>Độ phân giải<select id="resolution"></select></label>
+          <label>FPS<input id="fps" type="number" min="1" max="30" step="1"></label>
+          <label>Exposure (4–996)<input id="exposure" type="number" min="4" max="996"></label>
+          <label>Analogue gain (16–1023)<input id="analogue_gain" type="number" min="16" max="1023"></label>
+          <label>Gamma<input id="gamma" type="number" min="0.1" max="3" step="0.05"></label>
+          <label>Brightness<input id="brightness" type="number" min="-100" max="100" step="1"></label>
+          <label>Contrast<input id="contrast" type="number" min="0.5" max="2" step="0.05"></label>
+          <label>Saturation<input id="saturation" type="number" min="0" max="2" step="0.05"></label>
+          <label class="check"><input id="horizontal_flip" type="checkbox"> Lật ngang</label>
+          <label class="check"><input id="vertical_flip" type="checkbox"> Lật dọc</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Hiển thị trên video</legend>
+          <label class="check"><input id="draw_landmarks" type="checkbox"> Hiện landmark</label>
+          <label class="check"><input id="show_metrics_overlay" type="checkbox"> Hiện metrics trên ảnh</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Web stream</legend>
+          <label>JPEG quality<input id="jpeg_quality" type="number" min="30" max="100" step="1"></label>
+          <p class="hint">Ảnh và video được tạo trong trình duyệt rồi lưu trên máy đang mở trang này. Raspberry Pi không lưu media.</p>
+          <p class="hint">Độ phân giải cao làm giảm FPS xử lý. Dashboard luôn hiển thị FPS thực tế.</p>
+        </fieldset>
+      </div>
+    </section>
+
+    <section class="config-shell warning-config-shell">
+      <div class="section-heading">
+        <div><span class="eyebrow">CHỈ THAY ĐỔI KHI NHẤN APPLY</span><h2>Cấu hình nhận diện và cảnh báo</h2></div>
+        <div class="apply-actions">
+          <button id="restore" class="danger secondary">Khôi phục mặc định</button>
+          <button id="apply">Apply cảnh báo</button>
+        </div>
+      </div>
+      <div class="config-grid warning-config-grid">
+        <fieldset>
+          <legend>Nhận diện</legend>
+          <label>Mức nhạy<select id="sensitivity"><option value="custom">Custom</option><option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option></select></label>
+          <label>EAR threshold<input id="ear_threshold" type="number" min="0.05" max="0.5" step="0.01"></label>
+          <label>Yaw threshold (°)<input id="yaw_threshold_deg" type="number" min="5" max="90" step="1"></label>
+          <label>Pitch threshold (°)<input id="pitch_threshold_deg" type="number" min="5" max="90" step="1"></label>
+          <label>Calibration (s)<input id="calibration_seconds" type="number" min="0" max="30" step="0.5"></label>
+        </fieldset>
+        <fieldset>
+          <legend>Thời gian cảnh báo</legend>
+          <label>Cảnh báo mắt nhắm (s)<input id="eye_trigger_seconds" type="number" min="0.1" max="30" step="0.1"></label>
+          <label>Cảnh báo mất tập trung (s)<input id="distraction_trigger_seconds" type="number" min="0.1" max="30" step="0.1"></label>
+          <label>Cảnh báo rời khung hình (s)<input id="out_of_frame_trigger_seconds" type="number" min="0.1" max="30" step="0.1"></label>
+          <label>Xóa cảnh báo mắt (s)<input id="eye_clear_seconds" type="number" min="0" max="10" step="0.1"></label>
+          <label>Xóa cảnh báo tập trung (s)<input id="distraction_clear_seconds" type="number" min="0" max="10" step="0.1"></label>
+          <label>Xóa cảnh báo rời khung (s)<input id="out_of_frame_clear_seconds" type="number" min="0" max="10" step="0.1"></label>
+          <label>Metrics timeout (s)<input id="metrics_timeout_seconds" type="number" min="0.1" max="10" step="0.1"></label>
+        </fieldset>
+      </div>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+camera_node:
+  ros__parameters:
+    video_device: /dev/video0
+    sensor_device: /dev/v4l-subdev0
+    width: 640
+    height: 480
+    fps: 15.0
+    vertical_blanking: 520
+    exposure: 900
+    analogue_gain: 256
+    gamma: 0.55
+    brightness: 0.0
+    contrast: 1.0
+    saturation: 1.0
+    horizontal_flip: false
+    vertical_flip: false
+
+driver_monitor_node:
+  ros__parameters:
+    ear_threshold: 0.20
+    yaw_threshold_deg: 30.0
+    pitch_threshold_deg: 20.0
+    calibration_seconds: 5.0
+    draw_landmarks: true
+    show_metrics_overlay: true
+
+warning_manager_node:
+  ros__parameters:
+    eye_trigger_seconds: 2.0
+    distraction_trigger_seconds: 3.0
+    out_of_frame_trigger_seconds: 1.5
+    eye_clear_seconds: 0.5
+    distraction_clear_seconds: 1.0
+    out_of_frame_clear_seconds: 0.5
+    metrics_timeout_seconds: 1.0
+    publish_rate_hz: 10.0
+
+socketcan_bridge_node:
+  ros__parameters:
+    interface: can0
+    status_can_id: 384       # 0x180
+    heartbeat_can_id: 385    # 0x181
+    feedback_can_id: 640     # 0x280
+    status_rate_hz: 10.0
+    heartbeat_rate_hz: 1.0
+    feedback_timeout_seconds: 3.0
+    protocol_version: 1
+
+web_stream_node:
+  ros__parameters:
+    host: 0.0.0.0
+    port: 8080
+    jpeg_quality: 80
