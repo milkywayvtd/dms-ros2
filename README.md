@@ -1,12 +1,10 @@
 # Hệ thống Giám sát người lái (DMS) trên ROS2 với cảnh báo qua CAN bus
 
-Đồ án môn học – Ngành Kỹ sư Ô tô số, Đại học Bách khoa Hà Nội (HUST), 2026.
+Phần mềm giám sát người lái dùng camera trong cabin để phát hiện **buồn ngủ** (nhắm mắt kéo dài) và **mất tập trung** (quay đầu đi chỗ khác, rời khỏi khung hình). Hệ thống được tổ chức thành các node ROS2 độc lập; khi phát hiện nguy cơ, trạng thái cảnh báo được gửi ra **CAN bus qua SocketCAN** tới vi điều khiển **ESP32** để kích hoạt cảnh báo phần cứng, đồng thời hiển thị trên giao diện web. Toàn bộ phần mềm chạy trên **Raspberry Pi 4**.
 
-Phần mềm giám sát người lái dùng camera trong cabin để phát hiện **buồn ngủ** (nhắm mắt kéo dài) và **mất tập trung** (quay đầu đi chỗ khác, rời khỏi khung hình). Hệ thống được tổ chức thành các node ROS2 độc lập; khi phát hiện nguy cơ, trạng thái cảnh báo được gửi ra **CAN bus qua SocketCAN** tới một vi điều khiển (Arduino) để kích hoạt cảnh báo phần cứng, đồng thời hiển thị trên giao diện web.
+## Video
 
-## Video demo
-
-[![Video demo DMS](https://img.youtube.com/vi/4RZDJwtkaXk/hqdefault.jpg)](https://www.youtube.com/watch?v=4RZDJwtkaXk)
+- https://www.youtube.com/watch?v=4RZDJwtkaXk
 
 ## Tính năng
 
@@ -31,7 +29,7 @@ camera_node ──(sensor_msgs/Image)──► driver_monitor_node ──(Driver
                                      (HTTP :8080)                                │  ▲
                                                                        0x180/0x181  0x280
                                                                                  ▼  │
-                                                                              Arduino (CAN)
+                                                                              ESP32 (CAN)
 ```
 
 | Node | Chức năng |
@@ -46,9 +44,9 @@ camera_node ──(sensor_msgs/Image)──► driver_monitor_node ──(Driver
 
 | CAN ID | Hướng | Nội dung (8 byte) | Chu kỳ |
 |---|---|---|---|
-| `0x180` | DMS → Arduino | byte 0: trạng thái cảnh báo, byte 1: rolling counter | 10 Hz |
-| `0x181` | DMS → Arduino | byte 0: phiên bản giao thức, byte 1: tình trạng hệ thống, byte 2: counter | 1 Hz |
-| `0x280` | Arduino → DMS | byte 0: phần cứng OK (0/1), byte 1: counter, byte 2–7 = 0 | timeout 3 s |
+| `0x180` | DMS → ESP32 | byte 0: trạng thái cảnh báo, byte 1: rolling counter | 10 Hz |
+| `0x181` | DMS → ESP32 | byte 0: phiên bản giao thức, byte 1: tình trạng hệ thống, byte 2: counter | 1 Hz |
+| `0x280` | ESP32 → DMS | byte 0: phần cứng OK (0/1), byte 1: counter, byte 2–7 = 0 | timeout 3 s |
 
 ## Cấu trúc thư mục
 
@@ -65,7 +63,7 @@ src/
 
 ## Công nghệ sử dụng
 
-ROS2 · Python 3.10 · MediaPipe Face Mesh · OpenCV · SocketCAN (socket raw của Linux) · pytest · HTML/CSS/JavaScript
+Raspberry Pi 4 · ESP32 · ROS2 · Python 3.10 · MediaPipe Face Mesh · OpenCV · SocketCAN (socket raw của Linux) · pytest · HTML/CSS/JavaScript
 
 ## Cách chạy
 
@@ -95,4 +93,4 @@ colcon test --packages-select driver_monitor
 ## Tác giả
 
 Vũ Thành Đức – [github.com/milkywayvtd](https://github.com/milkywayvtd)
-Dự án được thực hiện cùng nhóm trong khuôn khổ đồ án môn học.
+Dự án được thực hiện cùng nhóm.
